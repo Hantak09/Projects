@@ -1,4 +1,3 @@
-# Projectsief
 Modern Application Projects Briefing:
 
 Week 2 : HTML and CSS pages.
