@@ -6,7 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 path = os.path.abspath(os.path.dirname(__file__))
 
 
-app = Flask(__name__, template_folder='./templates')
+app = Flask(__name__, template_folder='./templates', static_folder='./static')
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///" + os.path.join(path, 'database.sqlite3')
 db = SQLAlchemy(app)
 # db.init_app(app)
@@ -57,11 +57,19 @@ def add_student():
         first_name = request.form['f_name']
         last_name = request.form['l_name']
         checkbox = request.form.getlist("courses")
+        print(first_name, last_name, checkbox)
 
         if check_roll_no_exists(roll_number):
             return render_template("student_exist.html")
         else:
             return render_template_string("testing")
+
+@app.route('/student/<int:student_id>', methods=['GET'])
+def show_student(student_id):
+    if request.method == 'GET':
+        student = Student.query.filter_by(roll_number=student_id).first()
+        enrollments = Enrollments.query.filter_by(estudent_id=student_id)
+        return render_template("student_page.html", student=student, enroll=enrollments)
 
 
 if __name__=='__main__':
