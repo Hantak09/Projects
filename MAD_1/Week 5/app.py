@@ -1,13 +1,12 @@
 import os
 from sqlalchemy import text
-from flask import Flask, render_template_string, url_for
+from flask import Flask, render_template_string, url_for, redirect
 from flask import request
 from flask import render_template
 from flask_sqlalchemy import SQLAlchemy
 path = os.path.abspath(os.path.dirname(__file__))
 
-
-app = Flask(__name__, template_folder='./templates', static_folder='./static')
+app = Flask(__name__, template_folder='templates', static_folder='static')
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///" + os.path.join(path, 'database.sqlite3')
 db = SQLAlchemy(app)
 app.app_context().push()
@@ -41,7 +40,7 @@ def check_roll_no_exists(roll_no: str) -> bool:
 
 @app.route('/')
 def index():
-    students = Student.query.all()
+    students = Student.query.all(sort=Student.roll_number)
     if len(students) == 0:
         return render_template("empty_index.html")
     else:
@@ -94,11 +93,47 @@ def add_student():
                 enrollment_id += 1
 
             db.session.commit()
-            return url_for("index")
+            return redirect(url_for('index'))
 
-@app.route("/student/<int:student_id>/update")
+@app.route("/student/<int:student_id>/update", methods=['GET', 'POST'])
 def update_student(student_id):
-    return render_template("update.html")
+    if request.method == 'GET':
+        student = db.session.query(Student).filter_by(student_id=student_id).first()
+        return render_template("student_update.html", student=student)
+
+    if request.method == 'POST':
+        course_dict = {
+            "course_1": "CSE01",
+            "course_2": "CSE02",
+            "course_3": "CSE03",
+            "course_4": "BST13",
+        }
+
+        updated_first_nane = request.form['f_name']
+        updated_last_name = request.form['l_name']
+        updated_course_list = request.form.getlist("courses")
+
+        current = Student.query.get(student_id)
+        current.first_name = updated_first_nane
+        current.last_name = updated_last_name
+
+        current_course_list = [i.ecourse_id for i in Enrollments.query.filter_by(estudent_id=student_id).all()]
+        course_to_be_added = []
+
+        eid = db.session.execute(text("SELECT seq FROM sqlite_sequence where name='enrollments'")).scalar() + 1
+
+        for i in updated_course_list:
+            if course_dict[i] not in current_course_list:
+                course_to_be_added.append(Enrollments(enrollment_id=eid,
+                                                      estudent_id=student_id,
+                                                      ecourse_id=course_dict[i]
+                ))
+                print(eid, student_id, course_dict[i])
+                eid += 1
+        db.session.add_all(course_to_be_added)
+        db.session.commit()
+
+        return redirect(url_for("index"))
 
 @app.route("/student/<int:student_id>/delete")
 def delete_student(student_id):

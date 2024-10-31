@@ -1,0 +1,15 @@
+form {
+    width: 80%;
+}
+
+label{
+    display: inline-block;
+    text-align: right;
+    vertical-align: 30px;
+}
+
+input{
+    display: inline-flex;
+    background-color: rgb(229, 242, 255);
+    vertical-align: 30px;
+}
