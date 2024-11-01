@@ -1,12 +1,12 @@
 import os
 from sqlalchemy import text
-from flask import Flask, render_template_string, url_for, redirect
+from flask import Flask, url_for, redirect
 from flask import request
 from flask import render_template
 from flask_sqlalchemy import SQLAlchemy
 path = os.path.abspath(os.path.dirname(__file__))
 
-app = Flask(__name__, template_folder='templates', static_folder='static')
+app = Flask(__name__, template_folder='./templates', static_folder='./static')
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///" + os.path.join(path, 'database.sqlite3')
 db = SQLAlchemy(app)
 app.app_context().push()
@@ -40,7 +40,7 @@ def check_roll_no_exists(roll_no: str) -> bool:
 
 @app.route('/')
 def index():
-    students = Student.query.all(sort=Student.roll_number)
+    students = Student.query.all()
     if len(students) == 0:
         return render_template("empty_index.html")
     else:
@@ -51,7 +51,6 @@ def add_student():
     if request.method == 'GET':
         return render_template("add_student.html")
     elif request.method == 'POST':
-        """Extracting Form Data"""
         roll_number = request.form['roll']
         first_name = request.form['f_name']
         last_name = request.form['l_name']
@@ -101,7 +100,7 @@ def update_student(student_id):
         student = db.session.query(Student).filter_by(student_id=student_id).first()
         return render_template("student_update.html", student=student)
 
-    if request.method == 'POST':
+    elif request.method == 'POST':
         course_dict = {
             "course_1": "CSE01",
             "course_2": "CSE02",
@@ -137,7 +136,10 @@ def update_student(student_id):
 
 @app.route("/student/<int:student_id>/delete")
 def delete_student(student_id):
-    return render_template_string("delete_student page")
+    db.session.execute(text(f"DELETE FROM ENROLLMENTS WHERE estudent_id={student_id}"))
+    db.session.execute(text(f"DELETE FROM STUDENT WHERE student_id={student_id}"))
+    db.session.commit()
+    return redirect(url_for("index"))
 
 @app.route('/student/<int:student_id>', methods=['GET'])
 def show_student(student_id):
@@ -151,4 +153,4 @@ def show_student(student_id):
         return render_template("student_page.html", student=student, courses=student_courses)
 
 if __name__=='__main__':
-    app.run(debug=True)
+    app.run()
