@@ -7,3 +7,5 @@ Week 3 : A functional web server using flask and jinja2 work build on week 2 mod
 Week 4 : Web server with additional features with requests module build over week 3 modules.
 
 Week 5 : Database integrated over week 4 modules.
+
+Week 6 : API Designed with week 5 modeule reconstruction.
