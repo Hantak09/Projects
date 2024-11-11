@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/index-empty.css">
+    <title>Home</title>
+</head>
+<body>
+    <div><h1>Student List</h1></div>
+
+    <div><p>
+            No student found. Add the students now!<br>
+            <div id="student_add">
+                <a href='{{ url_for("student_add") }}'>+Add Student</a>
+            </div>
+        </p>
+    </div>
+</body>
+</html>
