@@ -8,4 +8,6 @@ Week 4 : Web server with additional features with requests module build over wee
 
 Week 5 : Database integrated over week 4 modules.
 
-Week 6 : API Designed with week 5 modeule reconstruction.
+Week 6 : API Designed with week 5 modeule reconstruction
+
+Week 7 : CRUD integration over week 5 and week 6 module
